@@ -1,1 +1,1 @@
-Tasks for the course "Fullstack open" hosten by Helsinki university
+Tasks for the course "Full Stack Open" hosted by Helsinki university
