@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; //Need to install UUID
-import personsService from './Services/personsService'
+import personsService from './Services/personsService.js'
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import Feedback from './components/Feedback';
 
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     console.log('effect')
@@ -22,7 +24,9 @@ const App = () => {
       })
       .catch(error => {
         console.error('Failed to fetch persons:', error);
+        setMessage({ text: 'Failed to fetch persons from server', type: 'error' });
         setPersons([]); // Set to empty array on error
+        setTimeout(() => setMessage(null), 5000);
       });
   }, [])
 
@@ -58,9 +62,13 @@ const App = () => {
           setPersons(persons.map(person => person.id !== existingPerson.id ? person : updatedPerson))
           setNewName('')
           setNewNumber('')
+          setMessage({ text: `Updated ${updatedPerson.name}`, type: 'success' });
+          setTimeout(() => setMessage(null), 5000);
         })
         .catch(error => {
           console.error('Failed to update person:', error);
+          setMessage({ text: `Information of ${existingPerson.name} has already been removed from server`, type: 'error' });
+          setTimeout(() => setMessage(null), 5000);
       });
       }
     } else {
@@ -73,9 +81,13 @@ const App = () => {
       setPersons(persons.concat(response));
       setNewName('');
       setNewNumber('');
+      setMessage({ text: `Added ${response.name}`, type: 'success' });
+      setTimeout(() => setMessage(null), 5000);
     })
     .catch(error => {
-      console.error('Failed to add person:', error);
+      console.error('Failed to add person:', error.response ? error.response.data : error.message);
+      setMessage({ text: 'Failed to add person', type: 'error' });
+      setTimeout(() => setMessage(null), 5000);
     });
     }
   };
@@ -90,9 +102,13 @@ const App = () => {
         .then(() => {
           console.log(`${name} deleted successfully`);
           setPersons((prevPersons) => (prevPersons || []).filter(n => n.id !== id));
+          setMessage({ text: `Deleted ${name}`, type: 'success' });
+          setTimeout(() => setMessage(null), 5000);
         })
         .catch(error => {
           console.error("Failed to delete person:", error);
+          setMessage({ text: `Failed to delete ${name}`, type: 'error' });
+          setTimeout(() => setMessage(null), 5000);
         });
       } else {
         console.log(`Deletion cancelled for ${name}`);
@@ -103,9 +119,13 @@ const App = () => {
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
+  //console.log("Persons state:", persons);
+  //console.log("Filtered persons:", personsToShow);
+
   return (
     <div>
       <h2>Phonebook</h2>
+      <Feedback message={message} />
 
       <Filter filter={filter} handleFiltering={handleFiltering}/>
 

@@ -1,13 +1,8 @@
 {
   "persons": [
     {
-      "name": "Ada Lovelace",
-      "number": "050 456345433",
-      "id": "2"
-    },
-    {
       "name": "Dan Abramov",
-      "number": "12-43-234345",
+      "number": "1111111111",
       "id": "3"
     },
     {
@@ -16,9 +11,9 @@
       "id": "4"
     },
     {
-      "name": "Kala Puikko",
-      "number": "040404040",
-      "id": "0175ee7a-258c-4e8c-a64a-1f938e353ea9"
+      "name": "Santeri",
+      "number": "65645645645",
+      "id": "7a031c79-ed41-4f59-878c-e4b01600cbe1"
     }
   ]
 }
