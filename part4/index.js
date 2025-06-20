@@ -1,8 +1,8 @@
-import mongoose from 'mongoose'
-import config from './utils/config.js'
-import app from './app.js'
+const mongoose = require('mongoose')
+const config = require('./utils/config')
+const app = require('./app')
 
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(config.MONGODB_URI)
 
 app.listen(config.PORT, () => {
   console.log(`Server running on port ${config.PORT}`)

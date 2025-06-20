@@ -1,10 +1,11 @@
-import dotenv from 'dotenv'
+const dotenv = require('dotenv')
+const { model } = require('mongoose')
 dotenv.config()
 
 const PORT = process.env.PORT || 3003
 const MONGODB_URI = process.env.MONGODB_URI
 
-export default {
+module.exports =  {
   MONGODB_URI,
   PORT
 }
