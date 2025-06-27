@@ -1,5 +1,7 @@
 const Blog = require('../models/blog')
 
+// This file contains test data for the blog API tests. 
+
 const initialBlogs = [
   {
     title: 'Blogi 1',

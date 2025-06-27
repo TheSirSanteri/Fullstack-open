@@ -98,6 +98,43 @@ test('blog without url is not added and returns 400', async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('a blog can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  //console.log('Blogs at start:', blogsAtStart)
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  //console.log('Blogs at end:', blogsAtEnd)
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+
+  const ids = blogsAtEnd.map(b => b.id)
+  assert.ok(!ids.includes(blogToDelete.id))
+})
+
+test('a blogs likes can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedData = { likes: blogToUpdate.likes + 1 }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, blogToUpdate.likes + 1)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+  assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
+})
+
+
 after(async () => {
   await mongoose.connection.close()
 })
