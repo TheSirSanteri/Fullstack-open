@@ -43,19 +43,19 @@ test('a valid blog can be added', async () => {
   assert.ok(titles.includes(helper.newBlog.title), 'New blog title should be in the list')
 })
 
-test('blogs are returned in JSON format', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
-
 test('returns all blogs', async () => {
 //  console.log('--- Testi alkaa ---')
   const response = await api.get('/api/blogs')
 //  console.log('Vastaus haettu:', response.body)
 
   assert.strictEqual(response.body.length, initialBlogs.length)
+})
+
+test('blogs are returned in JSON format', async () => {
+  await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
 })
 
 test('unique identifier property of the blog posts is named id', async () => {
@@ -67,6 +67,22 @@ test('unique identifier property of the blog posts is named id', async () => {
   })
 })
 
+test.only('if likes property is missing from request, it will default to 0', async () => {
+  const newBlog = {
+    title: 'Blog without likes',
+    author: 'Author',
+    url: 'http://nolikes.com'
+    // likes missing
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, 0)
+})
 
 after(async () => {
   await mongoose.connection.close()
