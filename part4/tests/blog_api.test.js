@@ -67,21 +67,35 @@ test('unique identifier property of the blog posts is named id', async () => {
   })
 })
 
-test.only('if likes property is missing from request, it will default to 0', async () => {
-  const newBlog = {
-    title: 'Blog without likes',
-    author: 'Author',
-    url: 'http://nolikes.com'
-    // likes missing
-  }
-
+test('if likes property is missing from request, it will default to 0', async () => {
   const response = await api
     .post('/api/blogs')
-    .send(newBlog)
+    .send(helper.blogWithoutLikes)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   assert.strictEqual(response.body.likes, 0)
+})
+
+test('blog without title is not added and returns 400', async () => {
+  await api
+    .post('/api/blogs')
+    .send(helper.blogWithoutTitle)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
+
+test('blog without url is not added and returns 400', async () => {
+
+  await api
+    .post('/api/blogs')
+    .send(helper.blogWithoutUrl)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
 after(async () => {

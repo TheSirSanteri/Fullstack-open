@@ -23,6 +23,28 @@ const newBlog = {
   likes: 3,
 }
 
+// Blog without likes for testing default value
+const blogWithoutLikes = {
+  title: 'Blog without likes',
+  author: 'Testaaja',
+  url: 'http://nolikes.com'
+  // likes missing
+}
+
+// Blog without title for testing validation
+const blogWithoutTitle = {
+  author: 'Testaaja',
+  url: 'http://notitle.com',
+  likes: 2
+}
+
+// Blog without url for testing validation
+const blogWithoutUrl = {
+  title: 'Blog without URL',
+  author: 'Testaaja',
+  likes: 12
+}
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
@@ -32,4 +54,7 @@ module.exports = {
   initialBlogs,
   blogsInDb,
   newBlog,
+  blogWithoutLikes,
+  blogWithoutTitle,
+  blogWithoutUrl,
 }
