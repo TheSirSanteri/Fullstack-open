@@ -15,6 +15,14 @@ const initialBlogs = [
   },
 ]
 
+// Blog for POST request tests
+const newBlog = {
+  title: 'Blogi POST',
+  author: 'Testaaja',
+  url: 'http://post.com',
+  likes: 3,
+}
+
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
@@ -23,4 +31,5 @@ const blogsInDb = async () => {
 module.exports = {
   initialBlogs,
   blogsInDb,
+  newBlog,
 }
