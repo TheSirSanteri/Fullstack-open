@@ -13,7 +13,8 @@ const api = supertest(app)
 const initialBlogs = helper.initialBlogs
 
 before(async () => {
-   await mongoose.connect(config.MONGODB_URI)
+  console.log('NODE_ENV:', process.env.NODE_ENV)
+  await mongoose.connect(config.MONGODB_URI)
 })
 
 beforeEach(async () => {
