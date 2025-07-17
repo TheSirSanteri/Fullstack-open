@@ -1,5 +1,5 @@
 const Blog = require('../models/blog')
-const user = require('../models/user')
+const User = require('../models/user')
 
 // This file contains test data for the blog API tests. 
 
@@ -64,7 +64,7 @@ const newUser = {
 const rootUser = {
   username: 'root',
   name: 'Test User',
-  password: 'testpassword'
+  password: 'sekret'
 }
 
 // user with too short username
@@ -81,6 +81,11 @@ const userWithShortPassword = {
   password: 'pw'
 }
 
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map(user => user.toJSON())
+}
+
 module.exports = {
   initialBlogs,
   blogsInDb,
@@ -92,4 +97,5 @@ module.exports = {
   rootUser,
   userWithShortUsername,
   userWithShortPassword,
+  usersInDb,
 }

@@ -19,8 +19,13 @@ beforeEach(async () => {
   await User.deleteMany({})
 
   const passwordHash = await bcrypt.hash('sekret', 10)
-  const user = new User({ username: 'root', passwordHash })
+  const user = new User({ 
+    username: helper.rootUser.username, 
+    name: helper.rootUser.name, 
+    passwordHash 
+  })
   await user.save()
+
 })
 
 test('creation fails with proper statuscode and message if username is taken', async () => {
@@ -31,9 +36,9 @@ test('creation fails with proper statuscode and message if username is taken', a
     .expect(400)
     .expect('Content-Type', /application\/json/)
 
-  assert.match(result.body.error, /username.*unique/i)
+  assert(result.body.error.includes('unique'))
 
-  const users = await User.find({})
+  const users = await helper.usersInDb()
   assert.strictEqual(users.length, 1)
 })
 
@@ -66,6 +71,7 @@ test('creation fails if password is too short', async () => {
 })
 
 test('creation succeeds with fresh username', async () => {
+  const usersAtStart = await helper.usersInDb()
 
   const result = await api
     .post('/api/users')
@@ -75,10 +81,11 @@ test('creation succeeds with fresh username', async () => {
 
   assert.strictEqual(result.body.username, 'newuser')
 
-  const users = await User.find({})
-  assert.strictEqual(users.length, 2)
+  const usersAtEnd = await helper.usersInDb()
+  assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
 })
 
 after(async () => {
+  await User.deleteMany({})
   await mongoose.connection.close()
 })

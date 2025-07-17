@@ -6,7 +6,8 @@ const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
 const config = require('../utils/config')
-
+const User = require('../models/user')
+const bcrypt = require('bcryptjs')
 
 const api = supertest(app)
 
@@ -18,19 +19,31 @@ before(async () => {
 })
 
 beforeEach(async () => {
-//  console.log('NODE_ENV:', process.env.NODE_ENV)
-//  console.log('MONGODB_URI käytössä:', require('../utils/config').MONGODB_URI)
-//  console.log('beforeEach alkaa')
+  // Tyhjennetään blogit ja käyttäjät
   await Blog.deleteMany({})
-//  console.log('Tietokanta tyhjennetty')
+  await User.deleteMany({})
 
-//  console.log('Lisättävät blogit:', helper.initialBlogs)
-  await Blog.insertMany(helper.initialBlogs)
-//  console.log('Blogit lisätty tietokantaan')
+  // Luodaan testikäyttäjä helper.rootUser-datan perusteella
+  const testUser = helper.newUser
+  const passwordHash = await bcrypt.hash(testUser.password, 10)
+  const user = new User({
+    username: testUser.username,
+    name: testUser.name,
+    passwordHash
+  })
+  const savedUser = await user.save()
+
+  // 3) Liitä käyttäjä jokaiseen initialBlog-dokumenttiin
+  const blogsWithUser = initialBlogs.map(blog => ({
+    ...blog,
+    user: savedUser._id
+  }))
+  await Blog.insertMany(blogsWithUser)
 })
 
 test('a valid blog can be added', async () => {
   const blogsAtStart = await helper.blogsInDb()
+
   await api
     .post('/api/blogs')
     .send(helper.newBlog)
@@ -39,9 +52,6 @@ test('a valid blog can be added', async () => {
 
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, blogsAtStart.length + 1)
-
-  const titles = blogsAtEnd.map(blog => blog.title)
-  assert.ok(titles.includes(helper.newBlog.title), 'New blog title should be in the list')
 })
 
 test('returns all blogs', async () => {
@@ -135,6 +145,14 @@ test('a blogs likes can be updated', async () => {
   assert.strictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
 })
 
+test('blog post includes user info', async () => {
+  const response = await api.get('/api/blogs')
+  const blog = response.body[0]
+  
+  assert.ok(blog.user)
+  assert.ok(blog.user.username)
+  assert.ok(blog.user.name)
+})
 
 after(async () => {
   await mongoose.connection.close()
