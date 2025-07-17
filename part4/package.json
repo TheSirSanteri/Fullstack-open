@@ -5,9 +5,10 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development node --watch index.js",
-    "test": "npm-run-all --sequential test:blogs test:users",
+    "test": "npm-run-all --sequential test:blogs test:users test:auth",
     "test:blogs": "cross-env NODE_ENV=test node --test tests/blog_api.test.js",
     "test:users": "cross-env NODE_ENV=test node --test tests/user_api.test.js",
+    "test:auth": "cross-env NODE_ENV=test node --test tests/auth_api.test.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
