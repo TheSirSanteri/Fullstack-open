@@ -1,22 +1,16 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, onLike, onDelete, currentUser }) => {
   const [visible, setVisible] = useState(false)
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
 
   const toggleVisibility = () => {
     setVisible(!visible)
   }
 
+  const isOwner = blog.user?.username === currentUser?.username
+
   return (
-    <div style={blogStyle}>
+    <div style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}>
       <div>
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
@@ -25,9 +19,10 @@ const Blog = ({ blog }) => {
         <div>
           <div>{blog.url}</div>
           <div>
-            likes {blog.likes} <button>like</button>
+            likes {blog.likes} <button onClick={() => onLike(blog)}>like</button>
           </div>
           <div>{blog.user?.name}</div>
+          {isOwner && <button onClick={() => onDelete(blog)}>delete</button>}
         </div>
       )}
     </div>

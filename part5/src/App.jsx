@@ -15,6 +15,8 @@ const App = () => {
 
   const blogFormRef = useRef()
 
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
@@ -64,6 +66,42 @@ const App = () => {
     }
   }
 
+  const likeBlog = async (blogToUpdate) => {
+    if (!blogToUpdate.user) {
+      showNotification('Cannot like blog: missing user data', 'error')
+      return
+    }
+
+    const updatedBlog = {
+      likes: blogToUpdate.likes + 1,
+      user: typeof blogToUpdate.user === 'object' ? blogToUpdate.user.id : blogToUpdate.user
+    }
+
+    try {
+      const returnedBlog = await blogService.update(blogToUpdate.id, updatedBlog)
+      setBlogs(blogs.map(b =>
+        b.id === blogToUpdate.id
+          ? { ...b, likes: returnedBlog.likes }
+          : b
+      ))
+    } catch (error) {
+      showNotification('Failed to like blog', 'error')
+    }
+  }
+
+  const deleteBlog = async (blogToDelete) => {
+    const ok = window.confirm(`Remove blog ${blogToDelete.title} by ${blogToDelete.author}?`)
+    if (!ok) return
+
+    try {
+      await blogService.remove(blogToDelete.id)
+      setBlogs(blogs.filter(b => b.id !== blogToDelete.id))
+      showNotification(`Deleted blog "${blogToDelete.title}"`, 'success')
+    } catch (error) {
+      showNotification('Failed to delete blog', 'error')
+    }
+  }
+
   if (user === null) {
     return (
       <div>
@@ -82,9 +120,15 @@ const App = () => {
       <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
         <BlogForm createBlog={createBlog} />
       </Togglable>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+      {sortedBlogs.map(blog =>
+        <Blog 
+          key={blog.id} 
+          blog={blog} 
+          onLike={likeBlog}
+          onDelete={deleteBlog}
+          currentUser={user}
+        />
+    )}
     </div>
   )
 }
