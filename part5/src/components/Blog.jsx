@@ -11,7 +11,10 @@ const Blog = ({ blog, onLike, onDelete, currentUser }) => {
   const isOwner = blog.user?.username === currentUser?.username
 
   return (
-    <div style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}>
+    <div
+    className="blog" 
+    style={{ paddingTop: 10, paddingLeft: 2, border: 'solid', borderWidth: 1, marginBottom: 5 }}
+    >
       <div>
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>

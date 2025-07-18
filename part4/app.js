@@ -16,6 +16,11 @@ app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing.js') 
+  app.use('/api/testing', testingRouter)
+}
+
 app.use((error, req, res, next) => {
   if (error.name === 'ValidationError') {
     return res.status(400).json({ error: error.message })
